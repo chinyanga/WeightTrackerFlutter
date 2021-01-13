@@ -90,17 +90,16 @@ class _LoginState extends State<Login> {
                       onPressed: snapshot.hasData
                           ? () async {
                               this.widget.bloc.setIsLoadingState(true);
-                              Navigator.pushReplacementNamed(context, "/home");
-
-                              /* await loginBloc
+                              await loginBloc
                                   .loginUser(User(
                                       username: usernameController.text.trim(),
                                       pwd: pwdController.text.trim()))
-                                  .then((token) async {
+                                  .then((user) async {
+                                print(userToJson(user));
                                 Navigator.pushReplacementNamed(
                                     context, "/home");
                                 this.widget.bloc.setIsLoadingState(false);
-                                await loginBloc
+                                /*await loginBloc
                                     .storeToken(token.toString())
                                     .then((_) {
                                   if (token != null) {
@@ -117,8 +116,10 @@ class _LoginState extends State<Login> {
                                       loginFailed = true;
                                       this.widget.bloc.setIsLoadingState(false);
                                     });
-                                });
-                              });*/
+                                });*/
+                              }).catchError((e) {
+                                this.widget.bloc.setIsLoadingState(false);
+                              });
                             }
                           : null,
                       child: Padding(

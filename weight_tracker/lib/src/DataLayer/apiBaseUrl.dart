@@ -1,3 +1,3 @@
 class ApiBaseUrl {
-  static String apiBaseUrl = "http://127.0.0.0:8080";
+  static String apiBaseUrl = "http://10.0.2.2:8080";
 }

@@ -166,6 +166,7 @@ class _SignUpState extends State<SignUp> {
                       onPressed: snapshot.hasData
                           ? () async {
                               this.widget.bloc.setIsLoadingState(true);
+                              print('Registering');
                               await signUpBloc
                                   .registerUser(User(
                                 username: usernameController.text.trim(),
@@ -183,6 +184,11 @@ class _SignUpState extends State<SignUp> {
                                     regFail = true;
                                     this.widget.bloc.setIsLoadingState(false);
                                   });
+                              }).catchError((e) {
+                                this.widget.bloc.setIsLoadingState(false);
+                                print('Registering');
+                              }).timeout(const Duration(minutes: 1), () {
+                                this.widget.bloc.setIsLoadingState(false);
                               });
                             }
                           : null,

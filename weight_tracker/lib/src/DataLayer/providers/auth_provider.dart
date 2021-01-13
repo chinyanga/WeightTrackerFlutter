@@ -11,7 +11,10 @@ class AuthApiProvider {
 
   Future<User> loginUser(User user) async {
     try {
-      final response = await http.post("$_apiBaseUrl/api/auth/signin");
+      print(userToJson(user));
+      final response = await http.post("$_apiBaseUrl/api/auth/signin",
+          body: userToJson(user));
+      print(response.body);
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
       return userFromJson(jsonResponse);
     } on SocketException {
@@ -22,9 +25,14 @@ class AuthApiProvider {
 
   Future<dynamic> registerUser(User user) async {
     try {
-      final response = await http.get("$_apiBaseUrl/api/auth/signup");
+      print(userToJson(user));
+      final response = await http.post("$_apiBaseUrl/api/auth/signup",
+          body: userToJson(user));
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
+      print(jsonResponse.body);
       return jsonResponse.body;
+    } catch (e) {
+      print(e);
     } on SocketException {
       print('No net');
       throw FetchDataException('No Internet connection');
