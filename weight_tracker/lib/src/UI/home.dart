@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weight_tracker/src/BLoC/home_bloc.dart';
+import 'package:weight_tracker/src/DataLayer/api-reponse_handlers/api_response.dart';
 import 'package:weight_tracker/src/UI/colors/colors.dart';
 import 'package:weight_tracker/src/models/user.dart';
 import 'package:weight_tracker/src/models/weight.dart';
@@ -12,13 +13,27 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final homeBloC = HomeBloC();
+  int targetWeight = 0;
+  int userId = 0;
   @override
   void initState() {
     super.initState();
+    homeBloC.getUserId().then((userId) {
+      homeBloC.fetchListOfAllUserWeights(userId);
+      setState(() {
+        userId = userId;
+      });
+    });
+    homeBloC.getTargetWeigt().then((tagWeight) {
+      setState(() {
+        targetWeight = tagWeight;
+      });
+    });
   }
 
   @override
   void dispose() {
+    homeBloC.dispose();
     super.dispose();
   }
 
@@ -34,7 +49,9 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                   icon: Icon(Icons.exit_to_app),
                   color: AppColors.red,
-                  onPressed: null)
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/login");
+                  })
             ],
           ),
           body: Container(
@@ -45,67 +62,85 @@ class _HomePageState extends State<HomePage> {
                   Divider(height: 10),
                   Container(
                     child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Text('Target Weight'), Text('50kgs')]),
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text('Target Weight'),
+                          Text('$targetWeight Kgs')
+                        ]),
                   ),
                   SizedBox(
                     height: 5,
                   ),
-                  StreamBuilder<Object>(
-                      stream: null,
+                  StreamBuilder<ApiResponse<List<Weight>>>(
+                      stream: homeBloC.weightListStream,
                       builder: (context, weightSnapShot) {
-                        return Container(
-                          height: MediaQuery.of(context).size.height * 0.70,
-                          child: ListView.builder(
-                              itemCount: 10,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Column(
-                                  children: [
-                                    Container(
-                                      height: 120,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                              context, "/weight/detail",
-                                              arguments: WeightDetailPageArgs(
-                                                  new Weight(),
-                                                  new User(),
-                                                  homeBloC));
-                                        },
-                                        child: ListTile(
-                                          leading: Text('100kgs'),
-                                          title: Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Text('2020-04-21',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                          subtitle: Text('23:00'),
-                                          trailing: Container(
-                                            width: 100,
-                                            child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text('-1.0'),
-                                                  Icon(Icons
-                                                      .keyboard_arrow_right)
-                                                ]),
+                        if (weightSnapShot.hasData) {
+                          if (weightSnapShot.data.status == Status.COMPLETED)
+                            return Container(
+                              height: MediaQuery.of(context).size.height * 0.70,
+                              child: ListView.builder(
+                                  itemCount: weightSnapShot.data.data.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          height: 120,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.pushNamed(
+                                                  context, "/weight/detail",
+                                                  arguments:
+                                                      WeightDetailPageArgs(
+                                                          weightSnapShot
+                                                              .data.data[index],
+                                                          User(
+                                                              target_weight:
+                                                                  targetWeight,
+                                                              id: userId),
+                                                          homeBloC));
+                                            },
+                                            child: ListTile(
+                                              leading: Text(
+                                                  '${weightSnapShot.data.data[index].weight}'),
+                                              title: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                    '${weightSnapShot.data.data[index].date_time.toString().split(" ")[0]}',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                              subtitle: Text(
+                                                  '${weightSnapShot.data.data[index].date_time.toString().split(" ")[1]}'),
+                                              trailing: Container(
+                                                width: 100,
+                                                child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                          '${weightSnapShot.data.data[index].weight - targetWeight} kgs'),
+                                                      Icon(Icons
+                                                          .keyboard_arrow_right)
+                                                    ]),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Divider(height: 10),
-                                    ),
-                                  ],
-                                );
-                              }),
-                        );
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8.0),
+                                          child: Divider(height: 10),
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                            );
+                        }
+                        return Container();
                       }),
                 ],
               ),

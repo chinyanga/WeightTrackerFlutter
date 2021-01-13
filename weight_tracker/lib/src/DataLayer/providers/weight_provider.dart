@@ -15,9 +15,10 @@ class WeightApiProvider {
     var token = prefs.getString("token");
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "x-access-token $token",
+      "x-access-token": token,
     };
     try {
+      print(token);
       final response = await http.get(
           "$_apiBaseUrl/api/userweights?user_id=$userId",
           headers: headers);
@@ -34,7 +35,7 @@ class WeightApiProvider {
     var token = prefs.getString("token");
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "x-access-token $token",
+      "x-access-token": token,
     };
     try {
       final response = await http.put("$_apiBaseUrl/api/updateweight",
@@ -52,11 +53,11 @@ class WeightApiProvider {
     var token = prefs.getString("token");
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "x-access-token $token",
+      "x-access-token": token,
     };
     try {
-      final response = await http
-          .delete("$_apiBaseUrl/api/deteleteweight?id=$id", headers: headers);
+      final response = await http.delete("$_apiBaseUrl/api/deleteweight?id=$id",
+          headers: headers);
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
       return jsonResponse;
     } on SocketException {
@@ -70,13 +71,17 @@ class WeightApiProvider {
     var token = prefs.getString("token");
     Map<String, String> headers = {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "x-access-token $token",
+      "x-access-token": token,
     };
     try {
+      print(weightToJson(weight));
       final response = await http.post("$_apiBaseUrl/api/addweight",
           headers: headers, body: weightToJson(weight));
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
+      print(response.body);
       return weightFromJson(jsonResponse);
+    } catch (e) {
+      print(e);
     } on SocketException {
       print('No net');
       throw FetchDataException('No Internet connection');

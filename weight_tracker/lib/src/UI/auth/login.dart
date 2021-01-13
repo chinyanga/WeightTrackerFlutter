@@ -90,35 +90,25 @@ class _LoginState extends State<Login> {
                       onPressed: snapshot.hasData
                           ? () async {
                               this.widget.bloc.setIsLoadingState(true);
+
                               await loginBloc
                                   .loginUser(User(
                                       username: usernameController.text.trim(),
                                       pwd: pwdController.text.trim()))
                                   .then((user) async {
-                                print(userToJson(user));
+                                await loginBloc.storeUserDetails(
+                                    user.accessToken,
+                                    user.id,
+                                    user.target_weight);
+                                print(user.accessToken +
+                                    user.id.toString() +
+                                    user.target_weight.toString());
                                 Navigator.pushReplacementNamed(
                                     context, "/home");
                                 this.widget.bloc.setIsLoadingState(false);
-                                /*await loginBloc
-                                    .storeToken(token.toString())
-                                    .then((_) {
-                                  if (token != null) {
-                                    int id =
-                                        loginBloc.decodeToken(token.toString());
-                                    print('storing a token' + token.toString());
-                                    this.widget.bloc.setIsLoadingState(false);
-                                    Navigator.of(context).pushReplacement(
-                                        new MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                HomePage()));
-                                  } else
-                                    setState(() {
-                                      loginFailed = true;
-                                      this.widget.bloc.setIsLoadingState(false);
-                                    });
-                                });*/
                               }).catchError((e) {
                                 this.widget.bloc.setIsLoadingState(false);
+                                print(e);
                               });
                             }
                           : null,

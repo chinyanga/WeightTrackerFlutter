@@ -33,7 +33,7 @@ class SignUpBloC extends Object with Validators implements BaseBloC {
   Stream<bool> get registerCheck => Rx.combineLatest3(
       username, password, comfirmPassword, (n, p, cp) => true);
 
-  registerUser(User user) async {
+  Future<dynamic> registerUser(User user) async {
     return await _authRepository.registerUser(user);
   }
 

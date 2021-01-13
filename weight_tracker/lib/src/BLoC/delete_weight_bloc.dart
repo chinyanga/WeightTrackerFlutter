@@ -16,7 +16,7 @@ class DeleteWeightBloC extends Object with Validators implements BaseBloC {
 
   Stream<ApiResponse<dynamic>> get weightStream => _deleteWeight.stream;
 
-  deleteWeight(int weightId) async {
+  Future<dynamic> deleteWeight(int weightId) async {
     _deleteWeight.sink.add(ApiResponse.loading('Deleting user weights...'));
     _isLoadingState.sink.add(true);
     try {

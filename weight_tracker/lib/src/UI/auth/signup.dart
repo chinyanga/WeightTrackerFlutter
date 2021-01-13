@@ -11,22 +11,17 @@ import 'package:intl/intl.dart';
 class SignUp extends StatefulWidget {
   final bool isSignUp;
   final AuthBloC bloc;
-  final int id;
-  final String apiToken;
-  SignUp(
-      {Key key,
-      @required this.isSignUp,
-      @required this.bloc,
-      this.apiToken,
-      this.id})
-      : super(key: key);
+  SignUp({
+    Key key,
+    @required this.isSignUp,
+    @required this.bloc,
+  }) : super(key: key);
   @override
   _SignUpState createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
   TextEditingController usernameController = new TextEditingController();
-  TextEditingController emailController = new TextEditingController();
   TextEditingController pwdController = new TextEditingController();
   TextEditingController cpwdController = new TextEditingController();
   final dateFormat = DateFormat("yyyy-MM-dd");
@@ -169,9 +164,11 @@ class _SignUpState extends State<SignUp> {
                               print('Registering');
                               await signUpBloc
                                   .registerUser(User(
-                                username: usernameController.text.trim(),
-                                pwd: pwdController.text.trim(),
-                              ))
+                                      username: usernameController.text.trim(),
+                                      pwd: pwdController.text.trim(),
+                                      weight: 50,
+                                      target_weight: 55,
+                                      dob: DateTime.now()))
                                   .then((user) async {
                                 if (user != null) {
                                   print('Registered');
@@ -187,9 +184,7 @@ class _SignUpState extends State<SignUp> {
                               }).catchError((e) {
                                 this.widget.bloc.setIsLoadingState(false);
                                 print('Registering');
-                              }).timeout(const Duration(minutes: 1), () {
-                                this.widget.bloc.setIsLoadingState(false);
-                              });
+                              }).timeout(const Duration(minutes: 1));
                             }
                           : null,
                       child: Padding(

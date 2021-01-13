@@ -35,6 +35,7 @@ class LoginBloC extends Object with Validators implements BaseBloC {
       Rx.combineLatest2(username, password, (n, p) => true);
 
   storeUserDetails(String token, int userId, int targetWeight) async {
+    print('LOGIN token login' + token);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('token', token);
     prefs.setInt('userId', userId);

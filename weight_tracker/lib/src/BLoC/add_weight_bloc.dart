@@ -17,7 +17,7 @@ class AddWeightBloC extends Object with Validators implements BaseBloC {
 
   Stream<ApiResponse<dynamic>> get weightStream => _addWeight.stream;
 
-  addWeight(Weight weight) async {
+  Future<dynamic> addWeight(Weight weight) async {
     _addWeight.sink.add(ApiResponse.loading('Adding user weights...'));
     _isLoadingState.sink.add(true);
     try {

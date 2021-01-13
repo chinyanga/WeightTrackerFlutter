@@ -13,6 +13,9 @@ class AuthApiProvider {
     try {
       print(userToJson(user));
       final response = await http.post("$_apiBaseUrl/api/auth/signin",
+          headers: {
+            HttpHeaders.contentTypeHeader: "application/json",
+          },
           body: userToJson(user));
       print(response.body);
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
@@ -27,6 +30,9 @@ class AuthApiProvider {
     try {
       print(userToJson(user));
       final response = await http.post("$_apiBaseUrl/api/auth/signup",
+          headers: {
+            HttpHeaders.contentTypeHeader: "application/json",
+          },
           body: userToJson(user));
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
       print(jsonResponse.body);

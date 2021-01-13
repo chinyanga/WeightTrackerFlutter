@@ -14,7 +14,7 @@ class Weight {
   Weight({
     this.id,
     this.weight,
-    this.dateTime,
+    this.date_time,
     this.userId,
     this.createdAt,
     this.updatedAt,
@@ -22,7 +22,7 @@ class Weight {
 
   int id;
   int weight;
-  DateTime dateTime;
+  DateTime date_time;
   int userId;
   DateTime createdAt;
   DateTime updatedAt;
@@ -30,7 +30,7 @@ class Weight {
   factory Weight.fromJson(Map<String, dynamic> json) => Weight(
         id: json["id"],
         weight: json["weight"],
-        dateTime: DateTime.parse(json["date_time"]),
+        date_time: DateTime.parse(json["date_time"]),
         userId: json["user_id"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
@@ -39,9 +39,9 @@ class Weight {
   Map<String, dynamic> toJson() => {
         "id": id,
         "weight": weight,
-        "date_time": dateTime.toIso8601String(),
+        "date_time": date_time == null
+            ? DateTime.now().toIso8601String()
+            : date_time.toIso8601String(),
         "user_id": userId,
-        "createdAt": createdAt.toIso8601String(),
-        "updatedAt": updatedAt.toIso8601String(),
       };
 }

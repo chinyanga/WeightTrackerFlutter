@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:weight_tracker/src/BLoC/add_weight_bloc.dart';
 import 'package:weight_tracker/src/BLoC/home_bloc.dart';
 import 'package:weight_tracker/src/UI/colors/colors.dart';
+import 'package:weight_tracker/src/models/weight.dart';
 
 class AddWeightPage extends StatefulWidget {
   final HomeBloC weightDetailBloC;
@@ -17,14 +19,23 @@ class AddWeightPage extends StatefulWidget {
 class _AddWeightPageState extends State<AddWeightPage> {
   final dateFormat = DateFormat("yyyy-MM-dd");
   final timeFormat = DateFormat("hh:mm a");
+  final addWeightBloC = AddWeightBloC();
+  int userId = 4;
 
   @override
   void initState() {
     super.initState();
+    this.widget.weightDetailBloC.getUserId().then((userId) {
+      setState(() {
+        userId = userId;
+        print(userId);
+      });
+    });
   }
 
   @override
   void dispose() {
+    addWeightBloC.dispose();
     super.dispose();
   }
 
@@ -103,7 +114,20 @@ class _AddWeightPageState extends State<AddWeightPage> {
                 padding: EdgeInsets.all(8),
                 child: RaisedButton(
                     color: AppColors.green,
-                    onPressed: () {},
+                    onPressed: () {
+                      addWeightBloC
+                          .addWeight(new Weight(
+                              userId: userId,
+                              weight: 50,
+                              date_time: DateTime.now()))
+                          .then((_) async {
+                        await this
+                            .widget
+                            .weightDetailBloC
+                            .fetchListOfAllUserWeights(userId);
+                        Navigator.of(context).pop();
+                      });
+                    },
                     child: Padding(
                         padding: EdgeInsets.only(left: 25, right: 25),
                         child: Text(

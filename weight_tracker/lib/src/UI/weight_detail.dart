@@ -1,6 +1,8 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
+import 'package:weight_tracker/src/BLoC/delete_weight_bloc.dart';
+import 'package:weight_tracker/src/BLoC/edit_weight_bloc.dart';
 import 'package:weight_tracker/src/BLoC/home_bloc.dart';
 import 'package:weight_tracker/src/UI/colors/colors.dart';
 import 'package:intl/intl.dart';
@@ -25,14 +27,19 @@ class WeightDetailPage extends StatefulWidget {
 class _WeightDetailPageState extends State<WeightDetailPage> {
   final dateFormat = DateFormat("yyyy-MM-dd");
   final timeFormat = DateFormat("hh:mm a");
+  final editWeightDetail = EditWeightBloC();
+  final deleteWeightDetail = DeleteWeightBloC();
 
   @override
   void initState() {
     super.initState();
+    print(this.widget.initialWeightDetails.id);
   }
 
   @override
   void dispose() {
+    deleteWeightDetail.dispose();
+    editWeightDetail.dispose();
     super.dispose();
   }
 
@@ -54,8 +61,10 @@ class _WeightDetailPageState extends State<WeightDetailPage> {
             SizedBox(
               height: 5,
             ),
-            Text("Target Weight"),
-            Text("Change"),
+            Text(
+                "Target Weight ${this.widget.initialWeightDetails.target_weight}"),
+            Text(
+                "Change ${(this.widget.capturedWeightDetails.weight - this.widget.initialWeightDetails.target_weight).toString()}"),
             Row(
               children: [
                 Text('Select Date'),
@@ -116,7 +125,23 @@ class _WeightDetailPageState extends State<WeightDetailPage> {
                     padding: EdgeInsets.all(8),
                     child: RaisedButton(
                         color: AppColors.green,
-                        onPressed: () {},
+                        onPressed: () {
+                          editWeightDetail
+                              .editWeight(Weight(
+                                  id: this.widget.capturedWeightDetails.id,
+                                  weight: 100,
+                                  date_time: DateTime.now()))
+                              .then(() async {
+                            await this
+                                .widget
+                                .weightDetailBloC
+                                .fetchListOfAllUserWeights(
+                                    this.widget.initialWeightDetails.id)
+                                .then(() {
+                              Navigator.of(context).pop();
+                            });
+                          });
+                        },
                         child: Padding(
                             padding: EdgeInsets.only(left: 25, right: 25),
                             child: Text(
@@ -127,7 +152,21 @@ class _WeightDetailPageState extends State<WeightDetailPage> {
                     padding: EdgeInsets.all(8),
                     child: RaisedButton(
                         color: AppColors.red,
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () {
+                          print(this.widget.capturedWeightDetails.id);
+                          deleteWeightDetail
+                              .deleteWeight(
+                                  this.widget.capturedWeightDetails.id)
+                              .then((_) async {
+                            await this
+                                .widget
+                                .weightDetailBloC
+                                .fetchListOfAllUserWeights(
+                                    this.widget.initialWeightDetails.id);
+
+                            Navigator.of(context).pop();
+                          });
+                        },
                         child: Padding(
                             padding: EdgeInsets.only(left: 25, right: 25),
                             child: Text(
