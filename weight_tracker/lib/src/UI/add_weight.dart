@@ -20,14 +20,18 @@ class _AddWeightPageState extends State<AddWeightPage> {
   final dateFormat = DateFormat("yyyy-MM-dd");
   final timeFormat = DateFormat("hh:mm a");
   final addWeightBloC = AddWeightBloC();
-  int userId = 4;
+  int currentUserId = 0;
+  int weight = 30;
+  int targetWweight = 65;
+  DateTime date = DateTime.now();
+  DateTime time = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     this.widget.weightDetailBloC.getUserId().then((userId) {
       setState(() {
-        userId = userId;
+        currentUserId = userId;
         print(userId);
       });
     });
@@ -64,11 +68,12 @@ class _AddWeightPageState extends State<AddWeightPage> {
                   width: 250,
                   child: DateTimeField(
                     format: dateFormat,
+                    onChanged: (selectedDate) => date = selectedDate,
                     onShowPicker: (context, currentValue) {
                       return showDatePicker(
                           context: context,
                           firstDate: DateTime(1900),
-                          initialDate: currentValue ?? DateTime.now(),
+                          initialDate: currentValue ?? date,
                           lastDate: DateTime(2100));
                     },
                   ),
@@ -79,16 +84,17 @@ class _AddWeightPageState extends State<AddWeightPage> {
               children: [
                 Text('Select Time'),
                 Container(
-                  width: 250,
+                  width: 200,
                   child: DateTimeField(
                     format: timeFormat,
+                    onChanged: (selectedTime) => time = selectedTime,
                     onShowPicker: (context, currentValue) async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(
-                            currentValue ?? DateTime.now()),
-                      );
-                      return DateTimeField.convert(time);
+                      final selectedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(
+                            currentValue ?? time,
+                          ));
+                      return DateTimeField.convert(selectedTime);
                     },
                   ),
                 ),
@@ -101,11 +107,13 @@ class _AddWeightPageState extends State<AddWeightPage> {
                   Container(
                       width: 250,
                       child: SpinBox(
-                          max: 300.0,
-                          min: 0.0,
-                          value: 5.0,
-                          decimals: 1,
-                          step: 0.1)),
+                        max: 200.0,
+                        min: 0.0,
+                        value: weight.toDouble(),
+                        decimals: 1,
+                        step: 0.1,
+                        onChanged: (w) => weight = w.toInt(),
+                      )),
                 ],
               ),
               padding: const EdgeInsets.all(16),
@@ -116,15 +124,17 @@ class _AddWeightPageState extends State<AddWeightPage> {
                     color: AppColors.green,
                     onPressed: () {
                       addWeightBloC
-                          .addWeight(new Weight(
-                              userId: userId,
-                              weight: 50,
-                              date_time: DateTime.now()))
+                          .addWeight(Weight(
+                              user_id: currentUserId,
+                              weight: weight.toInt(),
+                              target_weight: targetWweight.toInt(),
+                              date_time: DateTime(date.year, date.month,
+                                  date.day, time.hour, time.minute)))
                           .then((_) async {
                         await this
                             .widget
                             .weightDetailBloC
-                            .fetchListOfAllUserWeights(userId);
+                            .fetchListOfAllUserWeights(currentUserId);
                         Navigator.of(context).pop();
                       });
                     },

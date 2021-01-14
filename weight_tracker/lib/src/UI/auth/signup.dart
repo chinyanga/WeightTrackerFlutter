@@ -30,7 +30,10 @@ class _SignUpState extends State<SignUp> {
   var msg = "Weight Tracker\n Register by completing the form below";
   bool regSuccessful = false;
   bool regFail = false;
-  var error;
+  var error = 'Try again';
+  int weight = 30;
+  int targetWeight = 65;
+  DateTime dob = DateTime.now();
 
   @override
   void initState() {
@@ -124,11 +127,12 @@ class _SignUpState extends State<SignUp> {
                   width: 250,
                   child: DateTimeField(
                     format: dateFormat,
+                    onChanged: (selectedDate) => dob = selectedDate,
                     onShowPicker: (context, currentValue) {
                       return showDatePicker(
                           context: context,
                           firstDate: DateTime(1900),
-                          initialDate: currentValue ?? DateTime.now(),
+                          initialDate: currentValue ?? dob,
                           lastDate: DateTime(2100));
                     },
                   ),
@@ -142,11 +146,31 @@ class _SignUpState extends State<SignUp> {
                   Container(
                       width: 250,
                       child: SpinBox(
-                          max: 300.0,
-                          min: 0.0,
-                          value: 5.0,
-                          decimals: 1,
-                          step: 0.1)),
+                        max: 200.0,
+                        min: 0.0,
+                        value: weight.toDouble(),
+                        decimals: 1,
+                        step: 0.1,
+                        onChanged: (w) => weight = w.toInt(),
+                      )),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+            ),
+            Padding(
+              child: Row(
+                children: [
+                  Text('Target Weight'),
+                  Container(
+                      width: 200,
+                      child: SpinBox(
+                        max: 300.0,
+                        min: 0.0,
+                        value: targetWeight.toDouble(),
+                        decimals: 1,
+                        step: 0.1,
+                        onChanged: (tagW) => targetWeight = tagW.toInt(),
+                      )),
                 ],
               ),
               padding: const EdgeInsets.all(16),
@@ -166,10 +190,11 @@ class _SignUpState extends State<SignUp> {
                                   .registerUser(User(
                                       username: usernameController.text.trim(),
                                       pwd: pwdController.text.trim(),
-                                      weight: 50,
-                                      target_weight: 55,
-                                      dob: DateTime.now()))
+                                      weight: weight,
+                                      target_weight: targetWeight.toInt(),
+                                      dob: dob))
                                   .then((user) async {
+                                print(user);
                                 if (user != null) {
                                   print('Registered');
                                   setState(() {
@@ -179,6 +204,7 @@ class _SignUpState extends State<SignUp> {
                                 } else
                                   setState(() {
                                     regFail = true;
+                                    regSuccessful = false;
                                     this.widget.bloc.setIsLoadingState(false);
                                   });
                               }).catchError((e) {

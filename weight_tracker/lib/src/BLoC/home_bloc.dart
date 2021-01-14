@@ -28,12 +28,14 @@ class HomeBloC extends Object with Validators implements BaseBloC {
     return targetWeight;
   }
 
-  fetchListOfAllUserWeights(int userId) async {
+  Future<dynamic> fetchListOfAllUserWeights(int userId) async {
     _weightList.sink.add(ApiResponse.loading('Fetching user weights...'));
     try {
+      print("Reloading" + userId.toString());
       List<Weight> response = await _weightRepo.getUserWeights(userId);
       allUserWeight = response;
       _weightList.sink.add(ApiResponse.completed(response));
+      print(response);
     } catch (e) {
       _weightList.sink.add(ApiResponse.error(e.toString()));
       print(e.toString());

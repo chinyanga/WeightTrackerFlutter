@@ -17,11 +17,11 @@ class EditWeightBloC extends Object with Validators implements BaseBloC {
 
   Stream<ApiResponse<dynamic>> get weightStream => _editWeight.stream;
 
-  editWeight(Weight weight) async {
+  Future<dynamic> editWeight(Weight weight) async {
     _editWeight.sink.add(ApiResponse.loading('Editing user weights...'));
     _isLoadingState.sink.add(true);
     try {
-      var response = await _weightRepo.addWeight(weight);
+      var response = await _weightRepo.updateWeight(weight);
       _editWeight.sink.add(ApiResponse.completed(response));
       _isLoadingState.sink.add(false);
     } catch (e) {

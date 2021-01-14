@@ -38,7 +38,7 @@ class WeightApiProvider {
       "x-access-token": token,
     };
     try {
-      final response = await http.put("$_apiBaseUrl/api/updateweight",
+      final response = await http.put("$_apiBaseUrl/api/editweight",
           headers: headers, body: weightToJson(weight));
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
       return weightFromJson(jsonResponse);

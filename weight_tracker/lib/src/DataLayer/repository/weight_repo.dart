@@ -7,7 +7,7 @@ class WeightRepository {
   Future<List<Weight>> getUserWeights(int userId) =>
       weightApiProvider.fetchAllWeightByUser(userId);
 
-  Future<Weight> updateWeights(Weight weight) =>
+  Future<Weight> updateWeight(Weight weight) =>
       weightApiProvider.updateWeight(weight);
 
   Future<Weight> addWeight(Weight weight) =>

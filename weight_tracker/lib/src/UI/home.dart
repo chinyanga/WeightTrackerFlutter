@@ -75,6 +75,8 @@ class _HomePageState extends State<HomePage> {
                       stream: homeBloC.weightListStream,
                       builder: (context, weightSnapShot) {
                         if (weightSnapShot.hasData) {
+                          if (weightSnapShot.data.status == Status.LOADING)
+                            return CircularProgressIndicator();
                           if (weightSnapShot.data.status == Status.COMPLETED)
                             return Container(
                               height: MediaQuery.of(context).size.height * 0.70,
@@ -98,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                                                               target_weight:
                                                                   targetWeight,
                                                               id: userId),
-                                                          homeBloC));
+                                                          this.homeBloC));
                                             },
                                             child: ListTile(
                                               leading: Text(

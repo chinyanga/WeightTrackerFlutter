@@ -26,7 +26,7 @@ class AuthApiProvider {
     }
   }
 
-  Future<dynamic> registerUser(User user) async {
+  Future<User> registerUser(User user) async {
     try {
       print(userToJson(user));
       final response = await http.post("$_apiBaseUrl/api/auth/signup",
@@ -35,8 +35,8 @@ class AuthApiProvider {
           },
           body: userToJson(user));
       var jsonResponse = ApiBaseResponseHandler.returnResponse(response);
-      print(jsonResponse.body);
-      return jsonResponse.body;
+      print(jsonResponse);
+      return userFromJson(jsonResponse);
     } catch (e) {
       print(e);
     } on SocketException {
